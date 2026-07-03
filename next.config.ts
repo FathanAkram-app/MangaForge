@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Deploy as a self-hosted long-running Node server (Railway). `standalone`
-  // emits `.next/standalone/server.js` so background work via after() keeps
-  // running post-response — see plan.md §2.4 / §4.
-  output: "standalone",
-  // `pg` is already auto-externalized by Next; listed here to make the intent
-  // explicit (these run via native require, not the bundler).
+  // Deployed as a normal long-running Node server: Railway/Railpack builds the
+  // full app and runs `next start` (which serves public/ + static and lets our
+  // prestart migration run). We deliberately do NOT set `output: "standalone"` —
+  // Next 16 rejects `next start` with standalone, and standalone omits public/.
+  // `pg` is already auto-externalized by Next; listed explicitly for intent.
   serverExternalPackages: ["pg"],
 };
 
