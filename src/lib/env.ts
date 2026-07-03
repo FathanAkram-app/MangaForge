@@ -18,13 +18,23 @@ const EnvSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
   CLOUDFLARE_API_TOKEN: z.string().optional(),
 
-  // Image storage
-  STORAGE_DRIVER: z.enum(["disk", "r2"]).default("disk"),
+  // Image storage. Leave STORAGE_DRIVER unset to auto-detect: S3-compatible
+  // object storage is used when a full credential set is present, else disk.
+  STORAGE_DRIVER: z.enum(["disk", "r2", "s3"]).optional(),
   STORAGE_DISK_DIR: z.string().default("./.data/images"),
+
+  // S3-compatible object storage (Cloudflare R2, etc.). Credentials are read
+  // from either the R2_-prefixed names OR the plain names many providers inject.
   R2_ENDPOINT: z.string().optional(),
   R2_BUCKET: z.string().optional(),
+  R2_REGION: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
+  ENDPOINT: z.string().optional(),
+  BUCKET: z.string().optional(),
+  REGION: z.string().optional(),
+  ACCESS_KEY_ID: z.string().optional(),
+  SECRET_ACCESS_KEY: z.string().optional(),
 
   // App
   SESSION_SECRET: z.string().min(1, "SESSION_SECRET is required"),

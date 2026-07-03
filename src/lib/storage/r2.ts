@@ -1,30 +1,34 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getEnv } from "../env";
 import type { Storage, StoredImage } from "./types";
 
+export type S3Config = {
+  endpoint: string;
+  bucket: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+};
+
 /**
- * Cloudflare R2 storage (S3-compatible) for production. 10 GB free with zero
- * egress fees — safe for serving a public gallery (plan §2.4).
+ * S3-compatible object storage (Cloudflare R2, etc.) for production — durable,
+ * cheap, and decoupled from the app instance. Credentials are resolved in
+ * storage/index.ts (from R2_* or plain injected names) and passed in.
  */
 export class R2Storage implements Storage {
   private readonly client: S3Client;
   private readonly bucket: string;
 
-  constructor() {
-    const env = getEnv();
-    if (!env.R2_ENDPOINT || !env.R2_BUCKET || !env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY) {
-      throw new Error(
-        "STORAGE_DRIVER=r2 requires R2_ENDPOINT, R2_BUCKET, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY",
-      );
-    }
-    this.bucket = env.R2_BUCKET;
+  constructor(config: S3Config) {
+    this.bucket = config.bucket;
     this.client = new S3Client({
-      region: "auto",
-      endpoint: env.R2_ENDPOINT,
+      region: config.region,
+      endpoint: config.endpoint,
       credentials: {
-        accessKeyId: env.R2_ACCESS_KEY_ID,
-        secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
       },
+      // Path-style addressing works across S3-compatible providers (R2, MinIO…).
+      forcePathStyle: true,
     });
   }
 

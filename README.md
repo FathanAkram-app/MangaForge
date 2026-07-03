@@ -117,7 +117,7 @@ Each renders a distinct card with a specific action.
 The app is built for a self-hosted Node server (`output: "standalone"`).
 
 1. **Database:** create a free Neon project; copy its connection string into `DATABASE_URL`.
-2. **Storage:** create a Cloudflare R2 bucket + API token; set `STORAGE_DRIVER=r2` and the `R2_*` vars.
+2. **Storage:** create an S3-compatible bucket (Cloudflare R2 recommended). Provide its credentials as either the `R2_ENDPOINT`/`R2_BUCKET`/`R2_REGION`/`R2_ACCESS_KEY_ID`/`R2_SECRET_ACCESS_KEY` names **or** the plain `ENDPOINT`/`BUCKET`/`REGION`/`ACCESS_KEY_ID`/`SECRET_ACCESS_KEY` names most providers inject — object storage turns on automatically once a full set is present (no `STORAGE_DRIVER` needed).
 3. **Host:** create a Railway service from this repo, set all env vars, and deploy. Set Railway's start command to `npm run start` (after `npm run build`), and give the service a stop grace period of ≥ 30s so in-flight generations drain on redeploy.
 
 ---
