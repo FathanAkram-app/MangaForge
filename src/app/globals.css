@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* MangaForge design tokens — ink on paper with a single vermillion accent
+   (Exaggerated Minimalism; the black + white + red manga-cover palette). */
+@theme {
+  --color-paper: #faf9f6;
+  --color-ink: #111111;
+  --color-ink-soft: #52525b;
+  --color-muted: #f1efe8;
+  --color-accent: #e5342b;
+  --color-accent-dark: #b91c1c;
 }
 
+/* Fonts are wired to next/font CSS variables (set on <html>). */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Halftone/screentone dot texture (manga). Dots use currentColor, so set text
+   colour to control their tone (e.g. `text-ink/10`). */
+.halftone {
+  background-image: radial-gradient(currentColor 1.1px, transparent 1.3px);
+  background-size: 9px 9px;
+}
+
+/* Respect reduced-motion: neutralise animations and transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Panel editor: hide editor chrome (handles, placeholders, outlines) while
+   exporting a composed page to PNG. */
+[data-exporting] [data-export-ignore] {
+  display: none !important;
+}
+[data-exporting] * {
+  outline: none !important;
 }
