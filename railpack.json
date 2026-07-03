@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.railpack.com/railpack.schema.json",
+  "provider": "node",
+  "packages": {
+    "node": "22"
+  },
+  "deploy": {
+    "startCommand": "npm run start",
+    "variables": {
+      "HOSTNAME": "0.0.0.0"
+    }
+  }
+}
