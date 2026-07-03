@@ -11,7 +11,7 @@
 --   * params is JSONB so we can add manga knobs (genre, seed, size, character_ref)
 --     without migrations.
 
-CREATE EXTENSION IF NOT EXISTS pgcrypto;  -- gen_random_uuid()
+-- gen_random_uuid() is built into PostgreSQL 13+ (no pgcrypto extension needed).
 
 CREATE TABLE IF NOT EXISTS generations (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
