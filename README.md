@@ -40,6 +40,18 @@ Because the **DB row is the source of truth**, a refresh mid-generation just res
 
 ## Quick start (local, < 15 minutes)
 
+### Fastest path — Docker (one command)
+
+With Docker installed, from `manga-forge/`:
+
+```bash
+docker compose up --build
+```
+
+This starts Postgres **and** the app together, **auto-applies the database schema** (via the prestart migration), and uses the keyless Pollinations provider. Open **http://localhost:3000** — no local Node or Postgres install needed. Generated images persist in a Docker volume.
+
+Prefer to run it directly with Node? Continue below.
+
 ### Prerequisites
 - **Node.js ≥ 20.9** and npm
 - **PostgreSQL** running locally (any recent version) — or a free [Neon](https://neon.com) connection string

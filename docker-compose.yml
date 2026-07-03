@@ -1,0 +1,42 @@
+# One-command local run:  docker compose up --build
+# Starts Postgres + the app, auto-applies the schema (prestart migration),
+# uses the keyless Pollinations provider, and persists images in a volume.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: manga_forge
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d manga_forge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      # sslmode=disable: the compose Postgres doesn't serve TLS (see lib/db.ts).
+      DATABASE_URL: postgres://postgres:postgres@db:5432/manga_forge?sslmode=disable
+      SESSION_SECRET: local-docker-secret-change-me-0123456789abcdef
+      IMAGE_PROVIDER: pollinations
+      POLLINATIONS_BASE_URL: https://image.pollinations.ai
+      STORAGE_DRIVER: disk
+      STORAGE_DISK_DIR: /app/.data/images
+    volumes:
+      - images:/app/.data/images
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  images:
