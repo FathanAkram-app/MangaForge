@@ -55,6 +55,27 @@ export type GenerationDTO = {
   imageUrl: string | null;
 };
 
+/** Codes the user can fix themselves (their input) vs. faults on our side. */
+const USER_ERROR_CODES = new Set<string>(["invalid_prompt"]);
+
+/** True when a failure is the user's input to fix — show them the specifics. */
+export function isUserError(code: string | null | undefined): boolean {
+  return code != null && USER_ERROR_CODES.has(code);
+}
+
+/** Shown for any failure on our system — never leaks internal detail. */
+export const SYSTEM_ERROR_MESSAGE = "Please contact the MangaForge admin.";
+
+/**
+ * The message safe to show the client: the specific problem for a user (input)
+ * error, and a generic "contact admin" for anything on our system. The raw
+ * technical detail stays server-side (on the row) for logs.
+ */
+function clientErrorMessage(g: Generation): string | null {
+  if (g.status !== "failed") return null;
+  return isUserError(g.errorCode) ? g.errorMessage : SYSTEM_ERROR_MESSAGE;
+}
+
 export function toDTO(g: Generation): GenerationDTO {
   return {
     id: g.id,
@@ -63,7 +84,7 @@ export function toDTO(g: Generation): GenerationDTO {
     params: g.params,
     status: g.status,
     errorCode: g.errorCode,
-    errorMessage: g.errorMessage,
+    errorMessage: clientErrorMessage(g),
     isCharacter: g.isCharacter,
     characterLabel: g.characterLabel,
     createdAt: g.createdAt,

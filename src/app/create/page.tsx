@@ -10,7 +10,7 @@ import {
   saveAsCharacter,
   type CreateInput,
 } from "@/lib/client";
-import type { GenerationDTO } from "@/lib/generations/types";
+import { isUserError, SYSTEM_ERROR_MESSAGE, type GenerationDTO } from "@/lib/generations/types";
 import {
   MANGA_COLORS,
   MANGA_FORMATS,
@@ -127,7 +127,10 @@ export default function Studio() {
       const created = await createGeneration({ ...input, idempotencyKey: crypto.randomUUID() });
       setItems((prev) => [created, ...prev.filter((p) => p.id !== created.id)]);
     } catch (err) {
-      setFormError(err instanceof CreateError ? err.message : "Could not start the generation.");
+      // A user (input) error shows the specific problem; anything else is on us.
+      setFormError(
+        err instanceof CreateError && isUserError(err.code) ? err.message : SYSTEM_ERROR_MESSAGE,
+      );
     } finally {
       setSubmitting(false);
     }
