@@ -7,6 +7,7 @@ import {
   createGeneration,
   fetchGallery,
   pollGeneration,
+  retryGeneration,
   saveAsCharacter,
   type CreateInput,
 } from "@/lib/client";
@@ -166,16 +167,15 @@ export default function Studio() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Re-run a failed generation with the same settings (keep the seed).
-  function retry(item: GenerationDTO) {
-    void submit({
-      subject: item.params.subject,
-      genre: item.params.genre,
-      format: item.params.format,
-      color: item.params.color,
-      screentone: item.params.screentone,
-      seed: item.params.seed,
-    });
+  // Retry a failed generation IN PLACE — reset the same row and re-run it, so
+  // no duplicate is created (the old failed card is replaced, not left behind).
+  async function retry(item: GenerationDTO) {
+    try {
+      const updated = await retryGeneration(item.id);
+      setItems((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    } catch {
+      setFormError(SYSTEM_ERROR_MESSAGE);
+    }
   }
 
   async function handleSaveCharacter(item: GenerationDTO) {

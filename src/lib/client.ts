@@ -64,3 +64,10 @@ export async function saveAsCharacter(id: string, characterLabel: string): Promi
   if (!res.ok) throw new Error("Failed to save character.");
   return (await res.json()) as GenerationDTO;
 }
+
+/** Retry a failed generation in place — re-runs the same row (no duplicate). */
+export async function retryGeneration(id: string): Promise<GenerationDTO> {
+  const res = await fetch(`/api/generations/${id}`, { method: "POST" });
+  if (!res.ok) throw new Error("Failed to retry generation.");
+  return (await res.json()) as GenerationDTO;
+}

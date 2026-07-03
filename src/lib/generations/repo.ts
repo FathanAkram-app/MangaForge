@@ -104,3 +104,18 @@ export async function saveAsCharacter(id: string, sessionId: string, label: stri
   );
   return rows[0] ? mapRow(rows[0]) : null;
 }
+
+/**
+ * Reset a FAILED generation back to 'queued' so it can be re-run in place
+ * (no new row). Returns null if the row isn't found or isn't retryable.
+ */
+export async function resetForRetry(id: string, sessionId: string): Promise<Generation | null> {
+  const rows = await query<Row>(
+    `UPDATE generations
+       SET status = 'queued', error_code = NULL, error_message = NULL, image_key = NULL, updated_at = now()
+     WHERE id = $1 AND session_id = $2 AND status = 'failed'
+     RETURNING *`,
+    [id, sessionId],
+  );
+  return rows[0] ? mapRow(rows[0]) : null;
+}
