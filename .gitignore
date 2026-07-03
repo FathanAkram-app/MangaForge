@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# local image storage (STORAGE_DRIVER=disk) and other local data
+/.data/
 
 # vercel
 .vercel
